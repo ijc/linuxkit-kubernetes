@@ -178,17 +178,24 @@ workflows:
           requires:
             - dependencies
 
+      - approve-for-build:
+          type: approval
+
       - pkg-kubelet:
           requires:
+            - approve-for-build
             - dependencies
       - pkg-cri-containerd:
           requires:
+            - approve-for-build
             - dependencies
       - pkg-image-cache-common:
           requires:
+            - approve-for-build
             - dependencies
       - pkg-image-cache-control-plane:
           requires:
+            - approve-for-build
             - dependencies
       - pkgs:
           requires:
