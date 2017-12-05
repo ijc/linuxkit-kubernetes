@@ -35,6 +35,14 @@ linuxkit_pkg_build: &linuxkit_pkg_build
 image_build: &image_build
   docker:
     - image: debian:stretch
+  # image builds seem to need a bit more grunt (RAM) than usual. Possibly getting OOM killed, which https://github.com/moby/tool/pull/191 might help.
+  # NB: This will become a paid for feature at some point soon (with plenty of warning), so is not a long term solution.
+  # small 		1.0 	2GB
+  # medium (default) 	2.0 	4GB	pass:	fail:5
+  # medium+ 		3.0 	6GB	pass:	fail:2
+  # large 		4.0 	8GB	pass:2	fail:
+  # xlarge 		8.0 	16GB
+  resource_class: large
   steps:
     - run:
         name: Configure $PATH
@@ -42,7 +50,7 @@ image_build: &image_build
     - run:
         name: Install packages
         # ca-certificates are needed for attach_workspace (and git over https)
-        command: apt-get update && apt-get install -y ca-certificates curl git make openssh-client
+        command: apt-get update && apt-get install -y ca-certificates curl git make openssh-client strace
     - attach_workspace:
         at: /workspace
     - checkout
@@ -83,9 +91,11 @@ image_build: &image_build
         name: Build images
         command: |
           mkdir -p /workspace/images/kube-$KUBE_RUNTIME-$KUBE_NETWORK
-          # KUBE_FORMATS="iso-efi iso-bios" are much slower (especially for RUNTIME=docker) to build than tar.
-          # So for now just build tar files.
-          make KUBE_FORMATS="tar" master node
+          make LINUXKIT_ARGS="-v" KUBE_FORMATS="iso-bios" master node
+          mv kube-master*.iso kube-node*.iso /workspace/images/kube-$KUBE_RUNTIME-$KUBE_NETWORK
+    - persist_to_workspace:
+        root: /workspace
+        paths: images
 
 version: 2
 jobs:

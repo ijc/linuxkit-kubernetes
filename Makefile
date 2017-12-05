@@ -15,6 +15,8 @@ KUBE_FORMAT_ARGS := $(patsubst %,-format %,$(KUBE_FORMATS))
 all: master node
 
 master: yml/kube.yml yml/$(KUBE_RUNTIME).yml yml/$(KUBE_RUNTIME)-master.yml yml/$(KUBE_NETWORK).yml
+	# strace logs received signals
+	#strace -f -e trace=signal
 	linuxkit $(LINUXKIT_ARGS) build $(LINUXKIT_BUILD_ARGS) -name kube-master $(KUBE_FORMAT_ARGS) $^
 
 node: yml/kube.yml yml/$(KUBE_RUNTIME).yml yml/$(KUBE_NETWORK).yml
