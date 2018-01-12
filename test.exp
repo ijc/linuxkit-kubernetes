@@ -27,7 +27,7 @@ proc boot_linuxkit {} {
     # medium+             3.0     6GB
     # large               4.0     8GB     (7680M)
     # xlarge              8.0     16GB    (15827M)
-    spawn env {KUBE_RUN_ARGS=-publish 2222:22} KUBE_MEM=3584 KUBE_VCPUS=8 KUBE_DISK=8G KUBE_CLEAR_STATE=y KUBE_MASTER_UNTAINT=y ./boot.sh
+    spawn env {KUBE_RUN_ARGS=-publish 2222:22} KUBE_MEM=3584 KUBE_VCPUS=2 KUBE_DISK=8G KUBE_CLEAR_STATE=y KUBE_MASTER_UNTAINT=y ./boot.sh
     set lk_sid $spawn_id
     puts "INFO lk ($lk_sid) is pid [exp_pid -i $lk_sid]"
 }
