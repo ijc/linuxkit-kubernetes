@@ -90,27 +90,34 @@ image_build: &image_build
         paths: images
 
 image_boot: &image_boot
-  machine:
-    enabled: true
-    image: circleci/classic:latest # default Ubuntu 14.04 image
+  #machine:
+  #  enabled: true
+  #  image: circleci/classic:latest # default Ubuntu 14.04 image
+  macos:
+    xcode: "9.0"
   steps:
     - run:
         name: Configure $PATH
-        command: echo 'export PATH=~/workspace/bin-Linux:$PATH' >> $BASH_ENV
+        #command: echo 'export PATH=~/workspace/bin-Linux:$PATH' >> $BASH_ENV
+        command: echo 'export PATH=~/workspace/bin-Darwin:$PATH' >> $BASH_ENV
     - run:
         name: Install packages
         # ca-certificates are needed for attach_workspace (and git over https)
-        command: sudo apt-get update && sudo apt-get install -y ca-certificates curl expect git make openssh-client procps qemu xorriso
+        #command: sudo apt-get update && sudo apt-get install -y ca-certificates curl expect git make openssh-client procps qemu xorriso
+        command: brew install xorriso
     - attach_workspace:
         at: ~/workspace
     - checkout
     - run:
+        name: Versions
+        command: |
+          set -x
+          ~/workspace/bin-Darwin/linuxkit version
+          ~/workspace/bin-Darwin/vpnkit version
+    - run:
         name: Test boot
         command: |
           set -x
-          free
-          cat /proc/meminfo
-          ls -lrt /dev/kvm* || true
           # Add ssh keys to the image.
           # TODO could this be integrated into linuxkit/mkimage-iso-*
           # such that all those options do not need to be repeated
@@ -152,29 +159,38 @@ jobs:
     steps:
       - run:
           name: Create workspace
-          command: mkdir -p /workspace/bin-Linux
+          command: mkdir -p /workspace/bin-Linux /workspace/bin-Darwin
       - run:
           name: Install packages
           command: apt-get update && apt-get install -y ca-certificates curl openssh-client
       - run:
           name: Fetch binaries
           command: |
+            set -x
             curl -fsSL -o /tmp/docker.tgz https://download.docker.com/linux/static/stable/x86_64/docker-17.06.2-ce.tgz
             tar xfO /tmp/docker.tgz docker/docker > /workspace/bin-Linux/docker
             curl -fsSL -o /workspace/bin-Linux/linuxkit https://362-46932243-gh.circle-artifacts.com/0/linuxkit-linux-amd64
+            curl -fsSL -o /workspace/bin-Darwin/linuxkit https://362-46932243-gh.circle-artifacts.com/0/linuxkit-darwin-amd64
             curl -fsSL -o /workspace/bin-Linux/manifest-tool https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-amd64
             curl -fsSL -o /workspace/bin-Linux/notary https://github.com/theupdateframework/notary/releases/download/v0.4.3/notary-Linux-amd64
 
+            curl -fsSL -o /workspace/bin-Darwin/hyperkit https://452-55985023-gh.circle-artifacts.com/0/Users/distiller/hyperkit/build/hyperkit
+            curl -fsSL -o /tmp/vpnkit.tgz https://1066-58395340-gh.circle-artifacts.com/0/Users/distiller/vpnkit/vpnkit.tgz
+            tar xfO /tmp/vpnkit.tgz Contents/Resources/bin/vpnkit > /workspace/bin-Darwin/vpnkit
+
             echo "Downloaded:"
-            sha256sum /workspace/bin-Linux/*
+            sha256sum /workspace/bin-Linux/* /workspace/bin-Darwin/*
             echo
 
             echo "Checking checksums"
             sha256sum -c <<EOF
             6af40e74b2dbb2927882acab52d50bfc72551779d541957fc70b6adc325ee5ef  /workspace/bin-Linux/docker
             b61188823c2491e9a1c16d275e41c68d5736f3f10577d01cb358261ff71bbad6  /workspace/bin-Linux/linuxkit
+            908fae1c48122a245ddef8821a530a4c504f267ff1718b0c3688ef6f7aa3b65f  /workspace/bin-Darwin/linuxkit
             e4ca2ef0015a4be8597d31d9e3e70d88da33924ae72b0999e9f3b79304d4710d  /workspace/bin-Linux/manifest-tool
             06cd02c4c2e7a3b1ad9899b03b3d4dde5392d964c675247d32f604a24661f839  /workspace/bin-Linux/notary
+            298f650c9dd3ab8907b23f56cb21e33b794a5a8be163bbbcc7cf959112888b80  /workspace/bin-Darwin/hyperkit
+            72e34d9c0bc0a73bfb71f2b572849db5829ca41c3995245145f2e57c8ab40bd2  /workspace/bin-Darwin/vpnkit
             EOF
       - run:
           name: Generate SSH Keys
@@ -186,14 +202,16 @@ jobs:
           command: |
              chmod +x /workspace/bin-Linux/docker # docker version deferred until daemon configured in relevant jobs
              chmod +x /workspace/bin-Linux/linuxkit && /workspace/bin-Linux/linuxkit version
+             chmod +x /workspace/bin-Darwin/linuxkit # && /workspace/bin-Darwin/linuxkit version
              chmod +x /workspace/bin-Linux/manifest-tool && /workspace/bin-Linux/manifest-tool --version
              chmod +x /workspace/bin-Linux/notary && /workspace/bin-Linux/notary version
+             chmod +x /workspace/bin-Darwin/vpnkit # && /workspace/bin-Darwin/vpnkit version
       - persist_to_workspace:
           root: /workspace
-          paths: bin
-      - persist_to_workspace:
-          root: /workspace
-          paths: ssh
+          paths:
+            - bin-Linux
+            - bin-Darwin
+            - ssh
 
   lint:
     docker:
