@@ -265,37 +265,37 @@ jobs:
   pkg-kubernetes-docker-image-cache-control-plane:
     <<: *linuxkit_pkg_build
 
-  image-docker-weave:
-    <<: *image_build
-    # Needs to be configured/enabled by CircleCI person
-    #resource_class: large
-    environment:
-      - KUBE_RUNTIME: docker
-      - KUBE_NETWORK: weave
-  image-docker-bridge:
-    <<: *image_build
-    # Needs to be configured/enabled by CircleCI person
-    #resource_class: large
-    environment:
-      - KUBE_RUNTIME: docker
-      - KUBE_NETWORK: bridge
+  #image-docker-weave:
+  #  <<: *image_build
+  #  # Needs to be configured/enabled by CircleCI person
+  #  #resource_class: large
+  #  environment:
+  #    - KUBE_RUNTIME: docker
+  #    - KUBE_NETWORK: weave
+  #image-docker-bridge:
+  #  <<: *image_build
+  #  # Needs to be configured/enabled by CircleCI person
+  #  #resource_class: large
+  #  environment:
+  #    - KUBE_RUNTIME: docker
+  #    - KUBE_NETWORK: bridge
 
-  image-cri-containerd-weave:
-    <<: *image_build
-    environment:
-      - KUBE_RUNTIME: cri-containerd
-      - KUBE_NETWORK: weave
+  #image-cri-containerd-weave:
+  #  <<: *image_build
+  #  environment:
+  #    - KUBE_RUNTIME: cri-containerd
+  #    - KUBE_NETWORK: weave
   image-cri-containerd-bridge:
     <<: *image_build
     environment:
       - KUBE_RUNTIME: cri-containerd
       - KUBE_NETWORK: bridge
 
-  boot-docker-weave:
-    <<: *image_boot
-    environment:
-      - KUBE_RUNTIME: docker
-      - KUBE_NETWORK: weave
+  #boot-docker-weave:
+  #  <<: *image_boot
+  #  environment:
+  #    - KUBE_RUNTIME: docker
+  #    - KUBE_NETWORK: weave
 
   #boot-docker-bridge:
   #  <<: *image_boot
@@ -388,32 +388,32 @@ workflows:
           requires:
             - dependencies
 
-      - image-docker-weave:
-          requires:
-            - dependencies
-            - pkg-kubelet
-            - pkg-kubernetes-docker-image-cache-common
-            - pkg-kubernetes-docker-image-cache-control-plane
-      - image-docker-bridge:
-          requires:
-            - dependencies
-            - pkg-kubelet
-            - pkg-kubernetes-docker-image-cache-common
-            - pkg-kubernetes-docker-image-cache-control-plane
-      - image-cri-containerd-weave:
-          requires:
-            - dependencies
-            - pkg-kubelet
-            - pkg-cri-containerd
+      #- image-docker-weave:
+      #    requires:
+      #      - dependencies
+      #      - pkg-kubelet
+      #      - pkg-kubernetes-docker-image-cache-common
+      #      - pkg-kubernetes-docker-image-cache-control-plane
+      #- image-docker-bridge:
+      #    requires:
+      #      - dependencies
+      #      - pkg-kubelet
+      #      - pkg-kubernetes-docker-image-cache-common
+      #      - pkg-kubernetes-docker-image-cache-control-plane
+      #- image-cri-containerd-weave:
+      #    requires:
+      #      - dependencies
+      #      - pkg-kubelet
+      #      - pkg-cri-containerd
       - image-cri-containerd-bridge:
           requires:
             - dependencies
             - pkg-kubelet
             - pkg-cri-containerd
 
-      - boot-docker-weave:
-          requires:
-            - image-docker-weave
+      #- boot-docker-weave:
+      #    requires:
+      #      - image-docker-weave
 
       #- boot-docker-bridge:
       #    requires:
@@ -438,11 +438,11 @@ workflows:
             - pkg-kube-e2e-test
             - pkg-kubernetes-docker-image-cache-common
             - pkg-kubernetes-docker-image-cache-control-plane
-            - image-docker-weave
-            - image-docker-bridge
-            - image-cri-containerd-weave
+            #- image-docker-weave
+            #- image-docker-bridge
+            #- image-cri-containerd-weave
             - image-cri-containerd-bridge
-            - boot-docker-weave
+            #- boot-docker-weave
             #- boot-docker-bridge
             #- boot-cri-containerd-weave
             - boot-cri-containerd-bridge
