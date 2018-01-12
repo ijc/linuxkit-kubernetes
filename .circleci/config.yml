@@ -100,13 +100,14 @@ image_boot: &image_boot
     - run:
         name: Install packages
         # ca-certificates are needed for attach_workspace (and git over https)
-        command: apt-get update && apt-get install -y ca-certificates curl expect git make openssh-client procps qemu xorriso
+        command: sudo apt-get update && sudo apt-get install -y ca-certificates curl expect git make openssh-client procps qemu xorriso
     - attach_workspace:
         at: /workspace
     - checkout
     - run:
         name: Test boot
         command: |
+          ls -lrt /dev/kvm* || true
           # Add ssh keys to the image.
           # TODO could this be integrated into linuxkit/mkimage-iso-*
           # such that all those options do not need to be repeated
