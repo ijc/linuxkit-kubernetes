@@ -107,6 +107,7 @@ image_boot: &image_boot
     - run:
         name: Test boot
         command: |
+          set -x
           ls -lrt /dev/kvm* || true
           # Add ssh keys to the image.
           # TODO could this be integrated into linuxkit/mkimage-iso-*
@@ -122,6 +123,7 @@ image_boot: &image_boot
           #
           #   Cannot add /bin/ls to Joliet tree. Symlinks can only be added to a Rock Ridge tree.
 
+          id_rsa=~/workspace/ssh/id_rsa.pub
           xorriso -indev ~/workspace/images/kube-$KUBE_RUNTIME-$KUBE_NETWORK/kube-master.iso \
                   -outdev kube-master.iso \
                   -as genisoimage \
@@ -134,7 +136,7 @@ image_boot: &image_boot
                     -input-charset utf8 \
                   -- \
                   -pathspecs on \
-                  -add /root/.ssh/authorized_keys=~/workspace/ssh/id_rsa.pub
+                  -add /root/.ssh/authorized_keys=$id_rsa
 
           #cp ~/workspace/images/kube-$KUBE_RUNTIME-$KUBE_NETWORK/kube-{master,node}.iso .
           #cp ~/workspace/images/kube-$KUBE_RUNTIME-$KUBE_NETWORK/kube-master.iso .
