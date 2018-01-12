@@ -1,9 +1,3 @@
-# XXX NOTE:
-#
-#   The images built here will contain an ephemeral/throwaway ssh key
-#   pair, while not a problem to leak (they are per test only) the
-#   resulting images will not fully support ssh.
-
 linuxkit_pkg_build: &linuxkit_pkg_build
   docker:
     - image: debian:stretch
@@ -41,15 +35,6 @@ linuxkit_pkg_build: &linuxkit_pkg_build
 image_build: &image_build
   docker:
     - image: debian:stretch
-  # image builds seem to need a bit more grunt (RAM) than usual. Possibly getting OOM killed, which https://github.com/moby/tool/pull/191 might help.
-  # NB: This will become a paid for feature at some point soon (with plenty of warning), so is not a long term solution.
-  # small               1.0     2GB
-  # medium (default)    2.0     4GB     pass:   fail:5
-  # medium+             3.0     6GB     pass:   fail:2
-  # large               4.0     8GB     pass:2  fail:
-  # xlarge              8.0     16GB
-  # XXX with linuxkit from https://github.com/linuxkit/linuxkit/pull/2811 then default (medium) should be ok.
-  #resource_class: large
   steps:
     - run:
         name: Configure $PATH
