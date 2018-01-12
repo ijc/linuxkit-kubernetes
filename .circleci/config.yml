@@ -108,6 +108,8 @@ image_boot: &image_boot
         name: Test boot
         command: |
           set -x
+          free
+          cat /proc/meminfo
           ls -lrt /dev/kvm* || true
           # Add ssh keys to the image.
           # TODO could this be integrated into linuxkit/mkimage-iso-*
