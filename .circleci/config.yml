@@ -83,7 +83,7 @@ image_build: &image_build
         name: Build images
         command: |
           mkdir -p /workspace/images/kube-$KUBE_RUNTIME-$KUBE_NETWORK
-          make LINUXKIT_ARGS="-v" KUBE_FORMATS="iso-bios" master node
+          make KUBE_FORMATS="iso-bios" master node
           mv kube-master*.iso kube-node*.iso /workspace/images/kube-$KUBE_RUNTIME-$KUBE_NETWORK
     - persist_to_workspace:
         root: /workspace
@@ -179,10 +179,10 @@ jobs:
       - run:
           name: Versions
           command: |
-            chmod +x /workspace/bin/docker # docker version deferred until daemon configured in relevant jobs
-            chmod +x /workspace/bin/linuxkit && /workspace/bin/linuxkit version
-            chmod +x /workspace/bin/manifest-tool && /workspace/bin/manifest-tool --version
-            chmod +x /workspace/bin/notary && /workspace/bin/notary version
+             chmod +x /workspace/bin/docker # docker version deferred until daemon configured in relevant jobs
+             chmod +x /workspace/bin/linuxkit && /workspace/bin/linuxkit version
+             chmod +x /workspace/bin/manifest-tool && /workspace/bin/manifest-tool --version
+             chmod +x /workspace/bin/notary && /workspace/bin/notary version
       - persist_to_workspace:
           root: /workspace
           paths: bin
